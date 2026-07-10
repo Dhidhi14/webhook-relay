@@ -1,0 +1,41 @@
+# WebhookRelay - Reliable Webhook Delivery System
+
+## Project Context
+Backend-only webhook delivery service:
+- Producers POST events via API (API-key auth)
+- Consumers register webhook URLs (JWT auth)
+- Deliveries carry HMAC-SHA256 signed payloads
+- Failures retry with exponential backoff (5 attempts)
+- Exhausted deliveries become dead-letter, replayable manually
+- Every attempt is logged
+- 10 consecutive dead deliveries auto-disables an endpoint
+
+## Tech Stack
+Node.js + Express (ES modules), MongoDB + Mongoose, Redis + BullMQ,
+JWT + bcryptjs + API keys, zod, express-rate-limit, swagger-ui-express,
+Jest + Supertest + mongodb-memory-server, Docker.
+
+## Architecture
+Two processes, one codebase — src/server.js (Express API), src/worker.js (BullMQ delivery worker).
+
+## Code Conventions (STRICT)
+- ES modules, async/await only
+- API responses: { success: boolean, data?: any, error?: string }
+- Global error handler; controllers use next(err)
+- Business logic in /services, queue setup in /queues, never in controllers
+- AppError class (statusCode, message)
+- kebab-case filenames
+- All config via env through one config module
+- Endpoint secrets returned ONCE at creation, never again, never logged
+- Validate all input with zod middleware
+
+## What NOT to Do
+- Don't invent BullMQ APIs — say so if unsure
+- No console.log (use logger)
+- Comments explain WHY not WHAT
+
+## Before Generating Code
+1. Show a PLAN first.
+2. Wait for approval.
+3. Implement.
+4. State assumptions.

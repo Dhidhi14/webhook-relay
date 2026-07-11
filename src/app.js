@@ -6,6 +6,7 @@ import logger from './utils/logger.js';
 import { AppError } from './utils/app-error.js';
 import { errorHandler } from './middleware/error-handler.js';
 import authRoutes from './routes/auth.routes.js';
+import endpointRoutes from './routes/endpoint.routes.js';
 
 const app = express();
 
@@ -21,6 +22,7 @@ app.use(
 app.use(express.json({ limit: '1mb' }));
 
 app.use('/api/auth', authRoutes);
+app.use('/api/endpoints', endpointRoutes);
 
 app.get('/health', (req, res) => {
   res.json({

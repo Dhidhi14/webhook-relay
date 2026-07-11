@@ -27,4 +27,9 @@
 - Tests: 6/6 passed (create w/ secret, list w/o secret, get w/o secret, PATCH isActive toggle, invalid URL → 400, unknown id → 404).
 - Design notes: 404 (not 403) for not-owned endpoints — no information leak; prevents IDOR.
 
-## Next: Day 4 — Event ingestion + idempotency + fan-out
+## Day 4 — Event ingestion + idempotency + fan-out
+- Done: Event model (compound unique index on user + idempotencyKey), Delivery model, BullMQ delivery queue (5 attempts, exponential backoff), ingestEvent service with fan-out to active matching endpoints, POST /api/events protected by require-api-key.
+- Errors: none.
+- Tests: 4/4 passed (new event → 1 delivery + job enqueued, duplicate → no new deliveries, unknown type → 0 deliveries, missing idempotencyKey → 400). Redis keys confirmed (bull:deliveries:wait, bull:deliveries:1).
+
+## Next: Day 5 — Delivery worker with HMAC signing

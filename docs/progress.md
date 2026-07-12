@@ -42,4 +42,9 @@
 - Errors: stale Day 5 worker still running caused first test (evt-fail-1) to miss dead-letter handling; `npm run` on Windows did not pass `BACKOFF_DELAY_MS` override — fixed by starting via `node src/server.js` with inline env; httpstat.us intermittently returns ECONNRESET/timeouts.
 - Tests: evt-fail-3 → 5 attempts, delivery `dead`, endpoint `consecutiveDeadCount: 1`; worker logs show attempt N/5 progression and dead marking on exhaustion.
 
-## Next: Day 7 — Delivery logs, replay API, stats
+## Day 7 — Delivery logs, replay API, stats
+- Done: delivery-query.service (list/get/replay/stats), JWT-protected routes GET /api/deliveries, GET /api/deliveries/:id, POST /api/deliveries/:id/replay, GET /api/stats; replay re-enqueues dead deliveries without erasing attempt history.
+- Errors: none.
+- Tests: 6/6 passed (list dead, get with timeline, replay dead → pending → dead with 10 attempts, replay success → 400, stats sanity check, pagination limit=2).
+
+## Next: Day 8 — Swagger + tests + docker-compose

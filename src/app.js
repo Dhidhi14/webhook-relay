@@ -8,6 +8,9 @@ import { errorHandler } from './middleware/error-handler.js';
 import authRoutes from './routes/auth.routes.js';
 import endpointRoutes from './routes/endpoint.routes.js';
 import eventRoutes from './routes/event.routes.js';
+import deliveryRoutes from './routes/delivery.routes.js';
+import { requireJwt } from './middleware/require-jwt.js';
+import * as deliveryController from './controllers/delivery.controller.js';
 
 const app = express();
 
@@ -25,6 +28,8 @@ app.use(express.json({ limit: '1mb' }));
 app.use('/api/auth', authRoutes);
 app.use('/api/endpoints', endpointRoutes);
 app.use('/api/events', eventRoutes);
+app.use('/api/deliveries', deliveryRoutes);
+app.get('/api/stats', requireJwt, deliveryController.stats);
 
 app.get('/health', (req, res) => {
   res.json({

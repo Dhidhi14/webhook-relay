@@ -1,7 +1,7 @@
 import { Worker } from 'bullmq';
 import { connectDB, disconnectDB } from './config/db.js';
 import redis from './config/redis.js';
-import { deliverOne } from './services/delivery.service.js';
+import { deliverOne, handleExhaustedDelivery } from './services/delivery.service.js';
 import logger from './utils/logger.js';
 
 let worker;
@@ -39,10 +39,31 @@ async function start() {
     logger.info(`Delivery job ${job.id} completed for delivery ${job.data.deliveryId}`);
   });
 
-  worker.on('failed', (job, err) => {
+  worker.on('failed', async (job, err) => {
     logger.error(
       `Delivery job ${job?.id} failed for delivery ${job?.data?.deliveryId}: ${err.message}`,
     );
+
+    if (!job) {
+      return;
+    }
+
+    const maxAttempts = job.opts.attempts ?? 5;
+
+    logger.info(
+      `Delivery job ${job.id} attempt ${job.attemptsMade}/${maxAttempts} for delivery ${job.data.deliveryId}`,
+    );
+
+    if (job.attemptsMade >= maxAttempts) {
+      try {
+        await handleExhaustedDelivery(job.data.deliveryId);
+        logger.info(
+          `Delivery ${job.data.deliveryId} marked dead after ${job.attemptsMade} attempts`,
+        );
+      } catch (handlerErr) {
+        logger.error(`Failed to mark delivery dead: ${handlerErr.message}`);
+      }
+    }
   });
 
   logger.info('Delivery worker started');

@@ -37,4 +37,9 @@
 - Errors: Day 4 backlog job first attempt failed HTTP 404 (endpoint still had placeholder URL when worker started); succeeded on BullMQ retry after PATCH to webhook.site.
 - Tests: backlog job processed (retry → success), fresh event evt-hmac-1 → delivery status success with 1 attempt (HTTP 200, 656ms).
 
-## Next: Day 6 — Dead-letter handling, replay, logs/stats
+## Day 6 — Dead-letter handling + endpoint auto-disable
+- Done: worker `failed` handler marks delivery `dead` when attempts exhausted, increments endpoint `consecutiveDeadCount`, auto-disables endpoint at >= 10 with warning log; confirmed success path resets `consecutiveDeadCount` to 0 (Day 5).
+- Errors: stale Day 5 worker still running caused first test (evt-fail-1) to miss dead-letter handling; `npm run` on Windows did not pass `BACKOFF_DELAY_MS` override — fixed by starting via `node src/server.js` with inline env; httpstat.us intermittently returns ECONNRESET/timeouts.
+- Tests: evt-fail-3 → 5 attempts, delivery `dead`, endpoint `consecutiveDeadCount: 1`; worker logs show attempt N/5 progression and dead marking on exhaustion.
+
+## Next: Day 7 — Delivery logs, replay API, stats

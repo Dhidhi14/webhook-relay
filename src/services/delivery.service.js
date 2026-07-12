@@ -3,6 +3,7 @@ import Delivery from '../models/delivery.model.js';
 import Endpoint from '../models/endpoint.model.js';
 import Event from '../models/event.model.js';
 import { AppError } from '../utils/app-error.js';
+import logger from '../utils/logger.js';
 import { sign } from './signature.service.js';
 
 export async function deliverOne(deliveryId, attemptNumber) {
@@ -93,6 +94,32 @@ export async function deliverOne(deliveryId, attemptNumber) {
 
   await Delivery.findByIdAndUpdate(delivery._id, { status: 'failed' });
   throw new Error(error || 'Delivery failed');
+}
+
+export async function handleExhaustedDelivery(deliveryId) {
+  const delivery = await Delivery.findById(deliveryId);
+
+  if (!delivery) {
+    throw new AppError(404, 'Delivery not found');
+  }
+
+  await Delivery.findByIdAndUpdate(deliveryId, { status: 'dead' });
+
+  const endpoint = await Endpoint.findByIdAndUpdate(
+    delivery.endpoint,
+    { $inc: { consecutiveDeadCount: 1 } },
+    { new: true },
+  );
+
+  if (!endpoint) {
+    return;
+  }
+
+  if (endpoint.consecutiveDeadCount >= 10) {
+    endpoint.isActive = false;
+    await endpoint.save();
+    logger.warn(`endpoint auto-disabled: ${endpoint._id}`);
+  }
 }
 
 async function recordAttempt(deliveryId, attempt) {

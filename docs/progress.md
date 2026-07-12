@@ -32,4 +32,9 @@
 - Errors: none.
 - Tests: 4/4 passed (new event → 1 delivery + job enqueued, duplicate → no new deliveries, unknown type → 0 deliveries, missing idempotencyKey → 400). Redis keys confirmed (bull:deliveries:wait, bull:deliveries:1).
 
-## Next: Day 5 — Delivery worker with HMAC signing
+## Day 5 — Delivery worker with HMAC signing
+- Done: signature.service (HMAC-SHA256 sign/verify), delivery.service deliverOne (axios POST with signed headers, 5s timeout, attempt logging), worker.js (BullMQ Worker, concurrency 5, graceful shutdown).
+- Errors: Day 4 backlog job first attempt failed HTTP 404 (endpoint still had placeholder URL when worker started); succeeded on BullMQ retry after PATCH to webhook.site.
+- Tests: backlog job processed (retry → success), fresh event evt-hmac-1 → delivery status success with 1 attempt (HTTP 200, 656ms).
+
+## Next: Day 6 — Dead-letter handling, replay, logs/stats

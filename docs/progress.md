@@ -47,4 +47,9 @@
 - Errors: none.
 - Tests: 6/6 passed (list dead, get with timeline, replay dead → pending → dead with 10 attempts, replay success → 400, stats sanity check, pagination limit=2).
 
-## Next: Day 8 — Swagger + tests + docker-compose
+## Day 8 — Rate limiting + Swagger + security review
+- Done: authLimiter (10/15min) on /api/auth, apiLimiter (100/15min) on other /api routes, OpenAPI 3 spec at GET /docs, delivery list query validation (status enum).
+- Errors: Express 5 req.query is read-only — fixed validateQuery to use req.validatedQuery instead.
+- Tests: 4/4 passed (/docs 200, 11th wrong login → 429, JWT /api/deliveries works on separate limiter bucket, security review clean with one fix).
+
+## Next: Day 9 — Jest tests + docker-compose + README update

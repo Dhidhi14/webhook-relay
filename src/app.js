@@ -10,7 +10,10 @@ import endpointRoutes from './routes/endpoint.routes.js';
 import eventRoutes from './routes/event.routes.js';
 import deliveryRoutes from './routes/delivery.routes.js';
 import { requireJwt } from './middleware/require-jwt.js';
+import { authLimiter, apiLimiter } from './middleware/rate-limit.js';
 import * as deliveryController from './controllers/delivery.controller.js';
+import swaggerUi from 'swagger-ui-express';
+import { swaggerSpec } from './docs/swagger.js';
 
 const app = express();
 
@@ -25,11 +28,13 @@ app.use(
 );
 app.use(express.json({ limit: '1mb' }));
 
-app.use('/api/auth', authRoutes);
-app.use('/api/endpoints', endpointRoutes);
-app.use('/api/events', eventRoutes);
-app.use('/api/deliveries', deliveryRoutes);
-app.get('/api/stats', requireJwt, deliveryController.stats);
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+app.use('/api/auth', authLimiter, authRoutes);
+app.use('/api/endpoints', apiLimiter, endpointRoutes);
+app.use('/api/events', apiLimiter, eventRoutes);
+app.use('/api/deliveries', apiLimiter, deliveryRoutes);
+app.get('/api/stats', apiLimiter, requireJwt, deliveryController.stats);
 
 app.get('/health', (req, res) => {
   res.json({

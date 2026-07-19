@@ -59,4 +59,10 @@
 - Errors: Jest hung after run (open Redis/BullMQ handles) — fixed by closing deliveryQueue and quitting redis in afterAll.
 - Tests: 11/11 passed (`npm test`, ~4s, clean exit).
 
-## Next: Day 10 — docker-compose + README update
+## Day 10 (part 1) — Docker deployment packaging
+- Done: Dockerfile (node:20-alpine, npm ci --omit=dev, non-root user, shared image for api/worker via CMD override), docker-compose.yml (api:5000, worker, mongo w/ named volume, redis; healthchecks + depends_on), `.env.docker` for compose secrets, `.env.example` compose section, `scripts/seed.js` (idempotent demo user/endpoint/3 events).
+- Errors: port 5000 EADDRINUSE (stale local node) — killed PID; Docker CDN EOF on image pull — retried; httpbin slow from container (1/3 deliveries success, 2 dead after retries) — worker pipeline confirmed either way.
+- Verified: `docker compose up --build`, `/health` 200, seed inside api container, worker logs show job completion + retry/dead-letter, inspect-db `{ success: 1, dead: 2 }`, second seed run all duplicates, `docker compose down`.
+- Diagnosis (api "stopped" during verification): not a crash — `docker compose down` ran while a background combined verify command was still executing; compose file had no restart policy and Redis/Mongo lacked error/disconnect handlers (hardened in follow-up). Stability re-test: api Up 11 min, `/health` 200 at start and end (uptime 677s).
+
+## Next: Day 10 (part 2) — README update

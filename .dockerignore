@@ -1,0 +1,12 @@
+node_modules
+.env
+.env.*
+!.env.docker
+!.env.example
+coverage
+*.log
+.git
+tests
+docs
+README.md
+.cursorrules

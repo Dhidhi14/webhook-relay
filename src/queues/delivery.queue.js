@@ -15,7 +15,17 @@ const deliveryQueue = new Queue('deliveries', {
   },
 });
 
+let enqueueOverride = null;
+
+export function setEnqueueDelivery(fn) {
+  enqueueOverride = fn;
+}
+
 export async function enqueueDelivery(deliveryId) {
+  if (enqueueOverride) {
+    return enqueueOverride(deliveryId);
+  }
+
   await deliveryQueue.add('deliver', { deliveryId: deliveryId.toString() });
 }
 

@@ -30,11 +30,19 @@ app.use(express.json({ limit: '1mb' }));
 
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-app.use('/api/auth', authLimiter, authRoutes);
-app.use('/api/endpoints', apiLimiter, endpointRoutes);
-app.use('/api/events', apiLimiter, eventRoutes);
-app.use('/api/deliveries', apiLimiter, deliveryRoutes);
-app.get('/api/stats', apiLimiter, requireJwt, deliveryController.stats);
+if (process.env.NODE_ENV === 'test') {
+  app.use('/api/auth', authRoutes);
+  app.use('/api/endpoints', endpointRoutes);
+  app.use('/api/events', eventRoutes);
+  app.use('/api/deliveries', deliveryRoutes);
+  app.get('/api/stats', requireJwt, deliveryController.stats);
+} else {
+  app.use('/api/auth', authLimiter, authRoutes);
+  app.use('/api/endpoints', apiLimiter, endpointRoutes);
+  app.use('/api/events', apiLimiter, eventRoutes);
+  app.use('/api/deliveries', apiLimiter, deliveryRoutes);
+  app.get('/api/stats', apiLimiter, requireJwt, deliveryController.stats);
+}
 
 app.get('/health', (req, res) => {
   res.json({

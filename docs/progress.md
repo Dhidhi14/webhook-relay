@@ -52,4 +52,11 @@
 - Errors: Express 5 req.query is read-only — fixed validateQuery to use req.validatedQuery instead.
 - Tests: 4/4 passed (/docs 200, 11th wrong login → 429, JWT /api/deliveries works on separate limiter bucket, security review clean with one fix).
 
-## Next: Day 9 — Jest tests + docker-compose + README update
+## Day 9 — Automated Jest test suite
+- Done: Jest + Supertest + mongodb-memory-server; `tests/env.js` sets test env before imports; `tests/setup.js` spins up in-memory Mongo, clears collections between tests, mocks queue via `setEnqueueDelivery`, tears down queue + Redis on exit.
+- Production tweaks: `setEnqueueDelivery()` override in delivery.queue.js; rate limiters skipped when `NODE_ENV === 'test'`.
+- Test files: signature (5 unit), auth (4 integration), idempotency (1), e2e (1 — register → endpoint → event → pending delivery + mocked enqueue).
+- Errors: Jest hung after run (open Redis/BullMQ handles) — fixed by closing deliveryQueue and quitting redis in afterAll.
+- Tests: 11/11 passed (`npm test`, ~4s, clean exit).
+
+## Next: Day 10 — docker-compose + README update

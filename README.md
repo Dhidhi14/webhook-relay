@@ -54,7 +54,7 @@ Then seed demo data (creates a user, an endpoint, and fires 3 sample events):
 docker compose exec api node scripts/seed.js
 ```
 
-The seed prints a token and API key you can use. Open http://localhost:5000/docs to explore the API. To watch deliveries actually land somewhere, get a free URL from webhook.site and pass it while seeding with the SEED_WEBHOOK_URL env variable.
+The seed prints a token and API key you can use. Open http://localhost:5000/docs/ to explore the API. To watch deliveries actually land somewhere, get a free URL from webhook.site and pass it while seeding with the SEED_WEBHOOK_URL env variable.
 
 ## How retries work
 

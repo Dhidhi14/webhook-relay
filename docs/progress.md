@@ -65,4 +65,4 @@
 - Verified: `docker compose up --build`, `/health` 200, seed inside api container, worker logs show job completion + retry/dead-letter, inspect-db `{ success: 1, dead: 2 }`, second seed run all duplicates, `docker compose down`.
 - Diagnosis (api "stopped" during verification): not a crash — `docker compose down` ran while a background combined verify command was still executing; compose file had no restart policy and Redis/Mongo lacked error/disconnect handlers (hardened in follow-up). Stability re-test: api Up 11 min, `/health` 200 at start and end (uptime 677s).
 
-## Next: Day 10 (part 2) — README update
+## Project complete — all 10 days done, final acceptance passed
